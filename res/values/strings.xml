@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">EpiToken</string>
+    <string name="logout_button">Déconnexion</string>
+    <string name="settings_button">Paramètres</string>
+    <string name="connection_button">Connection</string>
+</resources>
