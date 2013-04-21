@@ -4,45 +4,51 @@
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
               android:orientation="vertical">
-	<RelativeLayout
+	<LinearLayout
 			android:layout_width="fill_parent"
 			android:layout_height="70dp"
 			android:orientation="horizontal"
+			android:weightSum="10"
 			android:id="@+id/item">
 
-		<TextView
-				android:layout_width="fill_parent"
-				android:layout_height="fill_parent"
-				android:id="@+id/text"
-				android:text="Hello World"
-				android:textSize="20dp"/>
+		<com.kokaz.epitoken.views.AutoScaleTextView
+		    android:id="@+id/text"
+		    android:layout_weight="7"
+		    android:layout_width="0dp"
+		    android:layout_height="fill_parent"
+		    android:padding="5dp"
+		    android:text="Hello World"
+		    android:textSize="16dp" />
 
-		<Button
+				<Button
 				android:id="@+id/expandable_toggle_button"
 				android:text="More"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+				android:layout_weight="3"
+				android:layout_width="0dp"
+				android:layout_height="fill_parent"
 				android:layout_alignBottom="@+id/text"
 				android:layout_alignParentRight="true"
 				android:layout_alignTop="@id/text"
-				android:textSize="30dp"/>
+				android:textSize="20dp"/>
 				<!-- android:background="@android:color/transparent"-->
-				<!-- android:drawableTop="@drawable/[your background image here]"--> 
-	</RelativeLayout>
+				<!-- android:drawableTop="@drawable/[your background image here]"-->
+		
+	</LinearLayout>
 
 	<LinearLayout
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:orientation="horizontal"
 			android:id="@+id/expandable"
+			android:weightSum="10"
 			android:background="#FFFFFF">
 
 	    <EditText
 	        android:id="@+id/token"
-	        android:layout_width="fill_parent"
+	        android:layout_width="0dp"
 	        android:layout_height="fill_parent"
-	        android:layout_weight="0.2"
 	        android:hint="Token"
+	        android:layout_weight="7"
 	        android:inputType="number"
 	        android:textColor="@color/token_color"
 	        android:maxLength="8"
@@ -50,10 +56,10 @@
 
 		<Button
 		    android:id="@+id/validate_token"
-		    android:layout_width="fill_parent"
+		    android:layout_width="0dp"
 		    android:layout_height="fill_parent"
-		    android:layout_weight="0.5"
 		    android:text="Valider"
+		    android:layout_weight="3"
 		    android:textSize="12dip" />
 	</LinearLayout>
 </LinearLayout>
