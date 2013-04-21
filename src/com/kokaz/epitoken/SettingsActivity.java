@@ -19,9 +19,16 @@ public class SettingsActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+    	SharedPreferences prefs = this.getSharedPreferences(
+    		      "epitoken", Context.MODE_PRIVATE);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 		HttpClientManager.setCookies(this);
+		EditText login = (EditText) findViewById(R.id.loginText);
+		EditText passwd = (EditText) findViewById(R.id.passwdText);
+		login.setText(prefs.getString("epitoken.login", ""));
+		passwd.setText(prefs.getString("epitoken.password", ""));
     }
 
     @Override
@@ -58,33 +65,7 @@ public class SettingsActivity extends Activity {
     	Toast.makeText(getApplicationContext(), "Connexion en cours...", Toast.LENGTH_SHORT).show();
     	this.connectionIntra(v);
     }
-    
-    public static String rot13(String s) {
-		StringBuilder out = new StringBuilder(s.length());
-		char[] ca = s.toCharArray();
-		
-		for (char c : ca) {
-			if (c >= 'a' && c <= 'm') c += 13;
-			else if (c >= 'n' && c <= 'z') c -= 13;
-			else if (c >= 'A' && c <= 'M') c += 13;
-			else if (c >= 'N' && c <= 'Z') c -= 13;
-			out.append(c);
-		}
-		return out.toString();
-    }
-    public static String derot13(String s) {
-		StringBuilder out = new StringBuilder(s.length());
-		char[] ca = s.toCharArray();
-		
-		for (char c : ca) {
-			if (c >= 'a' && c <= 'm') c += 13;
-			else if (c >= 'n' && c <= 'z') c -= 13;
-			else if (c >= 'A' && c <= 'M') c += 13;
-			else if (c >= 'N' && c <= 'Z') c -= 13;
-			out.append(c);
-		}
-		return out.toString();
-    }
+
     class IntraStatusHandler extends AsyncHttpResponseHandler {
         @Override
         public void onSuccess(String response) {

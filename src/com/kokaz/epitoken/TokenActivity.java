@@ -1,5 +1,7 @@
 package com.kokaz.epitoken;
 
+import java.util.ArrayList;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,41 +14,47 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.tjerkw.slideexpandable.library.ActionSlideExpandableListView;
 
 public class TokenActivity extends Activity {
-
+	private ActionSlideExpandableListView	list;
+	private TokenAdapter 					adapter = null;
+	private ArrayList<String>				m_alcourses;
+	private ArrayList<String>				m_codeevents;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.single_expandable_list);
 
+		list = (ActionSlideExpandableListView)findViewById(R.id.list);
+		
+		m_alcourses = new ArrayList<String>();
+		m_codeevents = new ArrayList<String>();
+		
 		HttpClientManager.setCookies(this);
 		getTokenJson();
 	}
 
-	private void postToken() {
+	private void postToken(String token, String eventId) {
 	}
 
 	public void getTokenJson() {
 		IntraResponseHandler response = new IntraResponseHandler();
 		Time days_ago = new Time();
-		days_ago.set(System.currentTimeMillis() - (3 * 24 * 60 * 60 * 1000));
+		days_ago.set(System.currentTimeMillis() + (3 * 24 * 60 * 60 * 1000));
 		String daDate = days_ago.format("%Y-%m-%d");
 		Time cur_date = new Time();
 		cur_date.set(System.currentTimeMillis());
 		String cDate = cur_date.format("%Y-%m-%d");
-		// HttpClientManager
-		// .get("/planning/load?format=json&start=2013-04-13&end=2013-04-14",
-		// response);
-		Log.e("EpiTokenError", "/planning/load?format=json&start=" + daDate
-				+ "&end=" + cDate + "&onlymypromo=true&onlymymodule=true");
-		HttpClientManager.get("/planning/load?format=json&start=" + daDate
-				+ "&end=" + cDate /*+ "&onlymypromo=true&onlymymodule=true"*/, response);
+		Log.e("EpiTokenError", "/planning/load?format=json&start=" + cDate
+				+ "&end=" + daDate + "&onlymypromo=true&onlymymodule=true");
+		HttpClientManager.get("/planning/load?format=json&start=" + cDate
+				+ "&end=" + daDate + "&onlymypromo=true&onlymymodule=true", response);
 	}
 
 	public boolean logoutClick(MenuItem item) {
@@ -96,45 +104,41 @@ public class TokenActivity extends Activity {
 					Toast.LENGTH_LONG).show();
 		}
 	}
-
-	public ArrayAdapter<String> ListViewAdapter(JSONArray courses) throws JSONException {
-		ArrayAdapter<String> values = new ArrayAdapter<String>(this, R.layout.expandable_list_item, R.id.text);
-
-		if (courses == null) {
-			Toast.makeText(getApplicationContext(), "Courses empty",
-					Toast.LENGTH_SHORT).show();
-		} else {
-			for (int i = 0; i < courses.length(); i++) {
+	private void create_list_courses(JSONArray courses)
+	{
+		for (int i = 0; i < courses.length(); i++) 
+			{
 				try {
 					JSONObject oneObject = courses.getJSONObject(i);
-					String value = oneObject.getString("acti_title");
-					if (oneObject.getString("event_registered").equals("registered") && oneObject.getString("allow_token").equals("true"))
-						values.add(value);
+					//if (oneObject.getString("event_registered").equals("registered") && oneObject.getString("allow_token").equals("true"))
+					{
+						m_codeevents.add(oneObject.getString("codeevent"));
+						m_alcourses.add(oneObject.getString("acti_title"));
+					}
 				} catch (JSONException e) {
-				}
 			}
 		}
-
-		return values;
 	}
 
 	public void fillListView(JSONArray courses) {
-		try {
-			ActionSlideExpandableListView list = (ActionSlideExpandableListView) this
-					.findViewById(R.id.list);
-			list.setAdapter(ListViewAdapter(courses));
-			list.setItemActionListener(
-					new ActionSlideExpandableListView.OnActionClickListener() {
-						@Override
-						public void onClick(View listView, View buttonview,
-								int position) {
-							if (buttonview.getId() == R.id.validate_token) {
-//								String toto = (String) listView.getTag();
-								postToken();
-							}
-						}
-					}, R.id.token, R.id.validate_token);
-		} catch (JSONException e) {
+		create_list_courses(courses);
+		if (adapter == null) {
+			adapter = new TokenAdapter(this, m_alcourses, m_codeevents, R.layout.expandable_list_item);
+			list.setAdapter(adapter);
 		}
+		else
+			adapter.notifyDataSetChanged();
+		list.setItemActionListener(
+				new ActionSlideExpandableListView.OnActionClickListener() 
+				{
+					@Override
+					public void onClick(View listView, View buttonview, int position) {
+						if (buttonview.getId() == R.id.validate_token) {
+							EditText token = (EditText)listView.findViewById(R.id.token);
+							String eventId = (String) buttonview.getTag();
+							postToken(token.toString(), eventId);
+						}
+					}
+				}, R.id.token, R.id.validate_token);
 	}
 }
